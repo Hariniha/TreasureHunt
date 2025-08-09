@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Download, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowLeft, Download, Sparkles } from 'lucide-react';
 
 const MapViewer= ({
   mapPieces,
   allPiecesCollected,
   hasClaimedNFT,
   onClaimNFT,
-  navigateToPage
+  navigateToPage,
+  finalImageHash
 }) => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -60,7 +61,8 @@ const MapViewer= ({
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg opacity-50"></div>
                 
                 {/* Map Grid */}
-                <div className="relative grid grid-cols-2 gap-2 h-full">
+
+                <div className="relative grid grid-cols-3 gap-2 h-full">
                   {mapPieces.map((piece) => (
                     <div
                       key={piece.id}
@@ -71,15 +73,11 @@ const MapViewer= ({
                       }`}
                     >
                       {piece.collected ? (
-                        <div className="text-center">
-                          <div className="text-4xl mb-2">🗺️</div>
-                          <div className="text-xs text-amber-800 font-semibold">
-                            Piece {piece.id}
-                          </div>
-                          <div className="text-xs text-amber-700">
-                            IPFS: {piece.ipfsHash.slice(0, 8)}...
-                          </div>
-                        </div>
+                        <img
+                          src={`https://ipfs.io/ipfs/${piece.ipfsHash}`}
+                          alt={`Piece ${piece.id}`}
+                          className="w-20 h-20 object-contain mx-auto"
+                        />
                       ) : (
                         <div className="text-center text-gray-500">
                           <div className="text-2xl mb-2">❓</div>
@@ -91,18 +89,19 @@ const MapViewer= ({
                 </div>
 
                 {/* Complete Map Overlay */}
-                {allPiecesCollected && showAnimation && (
+                {allPiecesCollected && showAnimation && finalImageHash && (
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-200 to-amber-300 rounded-lg flex items-center justify-center animate-fade-in">
                     <div className="text-center">
-                      <div className="text-6xl mb-4 animate-bounce">🏴‍☠️</div>
+                      <img
+                        src={`https://ipfs.io/ipfs/${finalImageHash}`}
+                        alt="Final Map"
+                        className="w-48 h-48 object-contain mx-auto mb-4 rounded shadow-lg border-4 border-yellow-400"
+                      />
                       <div className="text-2xl font-bold text-amber-900 mb-2">
-                        TREASURE LOCATION
+                        Complete Treasure Map!
                       </div>
                       <div className="text-lg text-amber-800">
-                        X marks the spot!
-                      </div>
-                      <div className="mt-4 text-sm text-amber-700">
-                        Complete map revealed
+                        All pieces connected.
                       </div>
                     </div>
                   </div>
@@ -117,7 +116,7 @@ const MapViewer= ({
               <div className="flex items-center gap-3 mb-6">
                 <h2 className="text-2xl font-bold text-white">Collection Status</h2>
                 <div className="px-3 py-1 bg-yellow-400/20 text-yellow-400 rounded-full text-sm font-semibold">
-                  {collectedCount}/4 pieces
+                  {collectedCount}/6 pieces
                 </div>
               </div>
 
@@ -147,12 +146,15 @@ const MapViewer= ({
                     
                     {piece.collected && (
                       <div className="mt-3 pt-3 border-t border-green-400/30">
-                        <div className="flex items-center gap-2 text-sm text-green-400">
-                          <ExternalLink className="w-4 h-4" />
-                          <span>IPFS: {piece.ipfsHash}</span>
+                        <div className="flex justify-center">
+                          <img
+                            src={`https://ipfs.io/ipfs/${piece.ipfsHash}`}
+                            alt={`Map Piece ${piece.id}`}
+                            className="w-16 h-16 object-contain rounded border border-green-400/30"
+                          />
                         </div>
                         {piece.collectedAt && (
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-gray-400 mt-2 text-center">
                             Collected: {piece.collectedAt.toLocaleString()}
                           </div>
                         )}

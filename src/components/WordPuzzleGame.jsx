@@ -28,6 +28,18 @@ const puzzles = [
     word: 'LEGENDARY',
     clue: 'Something famous from ancient stories and myths',
     hint: 'L _ _ _ _ _ _ _ _'
+  },
+  {
+    level: 5,
+    word: 'ISLAND',
+    clue: 'A piece of land surrounded by water, often the site of hidden treasures',
+    hint: 'I _ _ _ _ _'
+  },
+  {
+    level: 6,
+    word: 'PARROT',
+    clue: 'A colorful bird that often mimics speech and is a pirate’s companion',
+    hint: 'P _ _ _ _ _'
   }
 ];
 
@@ -42,7 +54,7 @@ const WordPuzzleGame = ({
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
-  const currentPuzzle = puzzles.find(p => p.level === Math.min(currentLevel, 4));
+  const currentPuzzle = puzzles.find(p => p.level === Math.min(currentLevel, 6));
   
   useEffect(() => {
     setUserInput('');
@@ -78,7 +90,7 @@ const WordPuzzleGame = ({
 
     if (isAnswerCorrect) {
       setTimeout(() => {
-        onLevelComplete(currentLevel);
+          onLevelComplete();
         setShowResult(false);
       }, 2000);
     }
