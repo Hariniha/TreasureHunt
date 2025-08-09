@@ -5,9 +5,7 @@ import WordPuzzleGame from './components/WordPuzzleGame';
 import MapViewer from './components/MapViewer';
 import ProfilePage from './components/ProfilePage';
 import Navigation from './components/Navigation';
-
-
-
+import { connectWallet } from './utils/web3';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -22,7 +20,24 @@ function App() {
     hasClaimedNFT: false,
     gamesCompleted: []
   });
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [progress, setProgress] = useState({ mapPieces: [], nftClaimed: false }); // Global progress state
 
+  const handleConnect = async () => {
+    if (isConnecting) return;
+    setIsConnecting(true);
+    try {
+      const { signer } = await connectWallet();
+      const address = await signer.getAddress();
+      setWalletAddress(address);
+    } catch (error) {
+      console.error(error);
+      // Optionally show error to user
+    } finally {
+      setIsConnecting(false);
+    }
+  };
   // Load progress from localStorage on mount
   useEffect(() => {
     const savedProgress = localStorage.getItem('treasureHuntProgress');
@@ -36,7 +51,15 @@ function App() {
     localStorage.setItem('treasureHuntProgress', JSON.stringify(userProgress));
   }, [userProgress]);
 
-  const navigateToPage = (page) => {
+  const navigateToPage = async (page) => {
+    if (page === 'profile' && !walletAddress) {
+      await handleConnect();
+      // After connecting, only navigate if connection was successful
+      if (window.ethereum && window.ethereum.selectedAddress) {
+        setCurrentPage('profile');
+      }
+      return;
+    }
     setCurrentPage(page);
   };
 
@@ -69,17 +92,16 @@ function App() {
         currentPage={currentPage}
         navigateToPage={navigateToPage}
         userProgress={userProgress}
+        walletAddress={walletAddress}
+        onConnectWallet={handleConnect}
       />
-      
       <main className="pt-16">
         {currentPage === 'home' && (
           <HomePage navigateToPage={navigateToPage} />
         )}
-        
         {currentPage === 'selection' && (
           <GameSelectionPage navigateToPage={navigateToPage} />
         )}
-        
         {currentPage === 'word-puzzle' && (
           <WordPuzzleGame 
             currentLevel={userProgress.currentLevel}
@@ -87,7 +109,6 @@ function App() {
             navigateToPage={navigateToPage}
           />
         )}
-        
         {currentPage === 'map' && (
           <MapViewer 
             mapPieces={userProgress.mapPieces}
@@ -97,10 +118,12 @@ function App() {
             navigateToPage={navigateToPage}
           />
         )}
-        
-        {currentPage === 'profile' && (
+        {/* Show wallet address if connected */}
+         
+        {walletAddress && currentPage === 'profile' && (
           <ProfilePage 
             userProgress={userProgress}
+            
             navigateToPage={navigateToPage}
           />
         )}

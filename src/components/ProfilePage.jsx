@@ -2,9 +2,7 @@ import React from 'react';
 import { ArrowLeft, Trophy, MapPin, Calendar, ExternalLink, Award } from 'lucide-react';
 
 
-
-
-const ProfilePage = ({ userProgress, navigateToPage }) => {
+const ProfilePage = ({ userProgress, walletAddress, navigateToPage }) => {
   const collectedPieces = userProgress.mapPieces.filter(piece => piece.collected);
   const completionPercentage = (collectedPieces.length / userProgress.mapPieces.length) * 100;
 
@@ -38,6 +36,9 @@ const ProfilePage = ({ userProgress, navigateToPage }) => {
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-2">Adventurer</h2>
                 <p className="text-gray-400">Digital Treasure Hunter</p>
+                {walletAddress && (
+                  <div className="mt-2 text-sm text-green-400 break-all">Wallet: {walletAddress}</div>
+                )}
               </div>
 
               <div className="space-y-4">

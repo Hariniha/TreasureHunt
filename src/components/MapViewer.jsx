@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Download, ExternalLink, Sparkles } from 'lucide-react';
 
-
-
 const MapViewer= ({
   mapPieces,
   allPiecesCollected,
