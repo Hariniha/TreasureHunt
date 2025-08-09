@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Puzzle, ArrowLeft, Lock } from 'lucide-react';
+import { BookOpen, Puzzle, ArrowLeft, Lock,MemoryStick } from 'lucide-react';
 
 
 
@@ -12,9 +12,21 @@ const GameSelectionPage = ({ navigateToPage }) => {
       description: 'Solve cryptic word challenges and riddles to unlock ancient secrets',
       icon: BookOpen,
       difficulty: 'Medium',
-      levels: 4,
+      levels: 6,
       available: true,
-      gradient: 'from-blue-500 to-purple-600'
+      gradient: 'from-blue-500 to-purple-600',
+      page: 'word-puzzle',
+    },
+    {
+      id: 'memory-match',
+      title: 'Memory Match',
+      description: 'Test your memory by matching pairs of treasure-themed cards',
+      icon: Puzzle,
+      difficulty: 'Easy',
+      levels: 6,
+      available: true,
+      gradient: 'from-yellow-400 to-orange-500',
+      page: 'memory-match',
     },
     {
       id: 'logic-puzzle',
@@ -22,10 +34,47 @@ const GameSelectionPage = ({ navigateToPage }) => {
       description: 'Navigate through complex logical puzzles and brain teasers',
       icon: Puzzle,
       difficulty: 'Hard',
-      levels: 4,
-      available: false,
-      gradient: 'from-green-500 to-teal-600'
-    }
+      levels: 6,
+      available: true,
+      gradient: 'from-green-500 to-teal-600',
+      page: 'logic-puzzle',
+    },
+    {
+      id: 'multiple-choice',
+      title: 'Multiple Choice',
+      description: 'Answer fun treasure-themed multiple choice questions',
+      icon: BookOpen,
+      difficulty: 'Easy',
+      levels: 6,
+      available: true,
+      gradient: 'from-pink-400 to-yellow-400',
+      page: 'multiple-choice',
+    },
+    {
+      id: 'riddle-quest',
+      title: 'Riddle Quest',
+      description: 'Solve classic riddles to unlock the next map piece',
+      icon: Puzzle,
+      difficulty: 'Medium',
+      levels: 6,
+      available: true,
+      gradient: 'from-purple-400 to-pink-600',
+      page: 'riddle-quest',
+    },
+    {
+      id: 'emoji-sequence',
+      title: 'Emoji Sequence',
+      description: 'Find the next emoji in the treasure sequence',
+      icon: Puzzle,
+      difficulty: 'Easy',
+      levels: 6,
+      available: true,
+      gradient: 'from-yellow-300 to-orange-400',
+      page: 'emoji-sequence',
+    },
+    
+
+      
   ];
 
   return (
@@ -57,7 +106,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
                 className={`relative group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl ${
                   game.available ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed opacity-60'
                 }`}
-                onClick={() => game.available && navigateToPage('word-puzzle' )}
+                onClick={() => game.available && navigateToPage(game.page)}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} rounded-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
                 
