@@ -10,8 +10,23 @@ const Navigation = ({
   walletAddress,
   onConnectWallet
 }) => {
-  const collectedPieces = userProgress.mapPieces.filter(piece => piece.collected).length;
-  const completionPercentage = (collectedPieces / userProgress.mapPieces.length) * 100;
+
+  // Determine which pieces array to use for progress (match App.jsx logic)
+  const getCurrentGameKey = () => {
+    switch (currentPage) {
+      case 'word-puzzle': return 'wordPuzzle';
+      case 'memory-match': return 'memoryMatch';
+      case 'logic-puzzle': return 'logicPuzzle';
+      case 'multiple-choice': return 'multipleChoice';
+      case 'riddle-quest': return 'riddleQuest';
+      case 'emoji-sequence': return 'emojiSequence';
+      default: return 'wordPuzzle';
+    }
+  };
+  const currentGameKey = getCurrentGameKey();
+  const currentPieces = userProgress[`${currentGameKey}Pieces`] || userProgress.wordPuzzlePieces || [];
+  const collectedPieces = currentPieces.filter(piece => piece.collected).length;
+  const completionPercentage = currentPieces.length > 0 ? (collectedPieces / currentPieces.length) * 100 : 0;
 
   const shortenAddress = (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '';
 

@@ -1,22 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Download, Sparkles } from 'lucide-react';
 
-const MapViewer= ({
-  mapPieces,
-  allPiecesCollected,
+
+const GAME_LIST = [
+  { key: 'wordPuzzle', label: 'Word Puzzle' },
+  { key: 'memoryMatch', label: 'Memory Match' },
+  { key: 'logicPuzzle', label: 'Logic Puzzle' },
+  { key: 'multipleChoice', label: 'Multiple Choice' },
+  { key: 'riddleQuest', label: 'Riddle Quest' },
+  { key: 'emojiSequence', label: 'Emoji Sequence' },
+];
+
+const MapViewer = ({
+  userProgress,
   hasClaimedNFT,
   onClaimNFT,
   navigateToPage,
-  finalImageHash
 }) => {
+  // Defensive: If userProgress is missing, show a fallback UI
+  if (!userProgress) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Loading map progress...</h2>
+          <p className="text-gray-400">Please wait or try refreshing the page.</p>
+        </div>
+      </div>
+    );
+  }
+  const [selectedGame, setSelectedGame] = useState('wordPuzzle');
+  const selectedGameRef = useRef(selectedGame);
+  useEffect(() => { selectedGameRef.current = selectedGame; }, [selectedGame]);
   const [showAnimation, setShowAnimation] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
 
+  // Get pieces and final image for selected game
+  const pieces = userProgress[`${selectedGame}Pieces`] || [];
+  const finalImageHash = userProgress[`${selectedGame}FinalImage`] || '';
+  const allPiecesCollected = pieces.length > 0 && pieces.every(piece => piece.collected);
   useEffect(() => {
     if (allPiecesCollected && !showAnimation) {
       setShowAnimation(true);
     }
-  }, [allPiecesCollected, showAnimation]);
+  }, [allPiecesCollected, showAnimation, selectedGame]);
 
   const handleClaimNFT = async () => {
     setIsClaiming(true);
@@ -26,7 +52,7 @@ const MapViewer= ({
     setIsClaiming(false);
   };
 
-  const collectedCount = mapPieces.filter(piece => piece.collected).length;
+  const collectedCount = pieces.filter(piece => piece.collected).length;
 
   return (
     <div className="min-h-screen py-20 px-4">
@@ -48,6 +74,18 @@ const MapViewer= ({
           </div>
         </div>
 
+        {/* Game Selector Tabs */}
+        <div className="mb-8 flex gap-2 justify-center">
+          {GAME_LIST.map(game => (
+            <button
+              key={game.key}
+              onClick={() => { setSelectedGame(game.key); setShowAnimation(false); }}
+              className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 ${selectedGame === game.key ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-yellow-400/20 hover:text-yellow-400'}`}
+            >
+              {game.label}
+            </button>
+          ))}
+        </div>
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Map Display */}
           <div className="order-2 lg:order-1">
@@ -63,7 +101,7 @@ const MapViewer= ({
                 {/* Map Grid */}
 
                 <div className="relative grid grid-cols-3 gap-2 h-full">
-                  {mapPieces.map((piece) => (
+                  {pieces.map((piece) => (
                     <div
                       key={piece.id}
                       className={`relative border-2 border-dashed border-amber-400 rounded-lg flex items-center justify-center transition-all duration-500 ${
@@ -121,7 +159,7 @@ const MapViewer= ({
               </div>
 
               <div className="space-y-4 mb-8">
-                {mapPieces.map((piece) => (
+                {pieces.map((piece) => (
                   <div
                     key={piece.id}
                     className={`p-4 rounded-lg border-2 transition-all duration-300 ${
@@ -223,7 +261,17 @@ const MapViewer= ({
                     Complete more levels to collect remaining map pieces!
                   </p>
                   <button
-                    onClick={() => navigateToPage('word-puzzle')}
+                    onClick={() => {
+                      const gameRouteMap = {
+                        wordPuzzle: 'word-puzzle',
+                        memoryMatch: 'memory-match',
+                        logicPuzzle: 'logic-puzzle',
+                        multipleChoice: 'multiple-choice',
+                        riddleQuest: 'riddle-quest',
+                        emojiSequence: 'emoji-sequence',
+                      };
+                      navigateToPage(gameRouteMap[selectedGameRef.current] || 'word-puzzle');
+                    }}
                     className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300"
                   >
                     Continue Quest

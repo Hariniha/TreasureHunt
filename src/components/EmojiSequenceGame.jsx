@@ -48,11 +48,22 @@ const EmojiSequenceGame = ({ currentLevel = 1, onLevelComplete, navigateToPage }
     setAttempts(prev => prev + 1);
     if (isAnswerCorrect) {
       setTimeout(() => {
-        onLevelComplete(currentLevel);
+        onLevelComplete();
         setShowResult(false);
       }, 2000);
     }
   };
+  {showResult && isCorrect && (
+    <div className="text-center p-6 rounded-lg border-2 bg-green-600/20 border-green-400 text-green-400 mb-4">
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <span className="text-xl font-bold">You found a piece of the treasure map!</span>
+      </div>
+      <div className="mt-4 text-yellow-400">
+        <div className="animate-spin w-8 h-8 mx-auto">⭐</div>
+        <p className="text-sm mt-2">Collecting map piece...</p>
+      </div>
+    </div>
+  )}
 
   return (
     <div className="min-h-screen py-20 px-4">

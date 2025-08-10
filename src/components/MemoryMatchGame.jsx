@@ -72,6 +72,8 @@ const MemoryMatchGame = ({ currentLevel = 1, onLevelComplete, navigateToPage }) 
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   useEffect(() => {
     // Duplicate and shuffle cards
@@ -81,14 +83,19 @@ const MemoryMatchGame = ({ currentLevel = 1, onLevelComplete, navigateToPage }) 
     setMatched([]);
     setMoves(0);
     setCompleted(false);
+  setShowResult(false);
+  setIsCorrect(false);
   }, [currentLevel]);
 
   useEffect(() => {
     if (matched.length === levelData.pairs.length * 2 && matched.length > 0) {
       setCompleted(true);
+      setShowResult(true);
+      setIsCorrect(true);
       setTimeout(() => {
-        if (onLevelComplete) onLevelComplete(currentLevel);
-      }, 1500);
+        if (onLevelComplete) onLevelComplete();
+        setShowResult(false);
+      }, 2000);
     }
   }, [matched, levelData, currentLevel, onLevelComplete]);
 
@@ -143,13 +150,30 @@ const MemoryMatchGame = ({ currentLevel = 1, onLevelComplete, navigateToPage }) 
         {completed && (
           <div className="text-center text-green-400 font-bold text-xl mb-4">Level Complete!</div>
         )}
-        {completed && (
-          <button
-            onClick={() => navigateToPage && navigateToPage('map')}
-            className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300"
-          >
-            View Your Map
-          </button>
+        {currentLevel > 6 || completed && (
+          <div className="text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-3xl font-bold text-white mb-4">Congratulations!</h2>
+            <p className="text-xl text-gray-400 mb-8">You've completed all memory match levels!</p>
+            <button
+              onClick={() => navigateToPage('map')}
+              className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300"
+            >
+              View Your Map
+            </button>
+          </div>
+        )}
+        {/* Show result after completion */}
+        {showResult && isCorrect && (
+          <div className="text-center p-6 rounded-lg border-2 bg-green-600/20 border-green-400 text-green-400 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-xl font-bold">You found a piece of the treasure map!</span>
+            </div>
+            <div className="mt-4 text-yellow-400">
+              <div className="animate-spin w-8 h-8 mx-auto">⭐</div>
+              <p className="text-sm mt-2">Collecting map piece...</p>
+            </div>
+          </div>
         )}
       </div>
     </div>

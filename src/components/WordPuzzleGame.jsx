@@ -122,7 +122,7 @@ const WordPuzzleGame = ({
             <div className="w-full bg-gray-700 rounded-full h-2">
               <div 
                 className="h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-500"
-                style={{ width: `${((currentLevel - 1) / 4) * 100}%` }}
+                style={{ width: `${((currentLevel - 1) / 6) * 100}%` }}
               ></div>
             </div>
           </div>
