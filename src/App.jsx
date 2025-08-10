@@ -42,12 +42,18 @@ function App() {
     multipleChoiceFinalImage: defaultFinalImage,
     riddleQuestFinalImage: defaultFinalImage,
     emojiSequenceFinalImage: defaultFinalImage,
-    hasClaimedNFT: false,
-    gamesCompleted: []
+    claimedNFTs: [], // Array to store all claimed NFTs from all games
+    gameNFTStatus: {
+      wordPuzzle: false,
+      memoryMatch: false,
+      logicPuzzle: false,
+      multipleChoice: false,
+      riddleQuest: false,
+      emojiSequence: false
+    }
   });
   const [walletAddress, setWalletAddress] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [progress, setProgress] = useState({ mapPieces: [], nftClaimed: false }); // Global progress state
 
   const handleConnect = async () => {
     if (isConnecting) return;
@@ -83,6 +89,15 @@ function App() {
         multipleChoiceFinalImage: parsed.multipleChoiceFinalImage || defaultFinalImage,
         riddleQuestFinalImage: parsed.riddleQuestFinalImage || defaultFinalImage,
         emojiSequenceFinalImage: parsed.emojiSequenceFinalImage || defaultFinalImage,
+        claimedNFTs: Array.isArray(parsed.claimedNFTs) ? parsed.claimedNFTs : [],
+        gameNFTStatus: parsed.gameNFTStatus || {
+          wordPuzzle: false,
+          memoryMatch: false,
+          logicPuzzle: false,
+          multipleChoice: false,
+          riddleQuest: false,
+          emojiSequence: false
+        }
       }));
     }
   }, []);
@@ -129,13 +144,21 @@ function App() {
     });
   };
 
-  const claimNFT = () => {
-    const tokenId = `THG-${Date.now()}`;
-    setUserProgress(prev => ({
-      ...prev,
-      hasClaimedNFT: true,
-      nftTokenId: tokenId
-    }));
+  const claimNFT = async (gameKey, nftData) => {
+    try {
+      setUserProgress(prev => ({
+        ...prev,
+        claimedNFTs: [...(prev.claimedNFTs || []), { ...nftData, gameType: gameKey }],
+        gameNFTStatus: {
+          ...prev.gameNFTStatus,
+          [gameKey]: true
+        }
+      }));
+      return true;
+    } catch (error) {
+      console.error('Error claiming NFT:', error);
+      return false;
+    }
   };
 
   // Helper to get current game's pieces and final image for MapViewer
@@ -214,9 +237,10 @@ function App() {
           />
         )}
         {currentPage === 'map' && (
-          <MapViewer 
+          <MapViewer
             userProgress={userProgress}
-            hasClaimedNFT={userProgress.hasClaimedNFT}
+            currentGameKey={currentGameKey}
+            walletAddress={walletAddress}
             onClaimNFT={claimNFT}
             navigateToPage={navigateToPage}
           />

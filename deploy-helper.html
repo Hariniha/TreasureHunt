@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TreasureHunt NFT Contract Deployment Helper</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .step h3 { margin-top: 0; color: #4CAF50; }
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: monospace;
+        }
+        input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .success { background: rgba(76, 175, 80, 0.2); border-color: #4CAF50; }
+        .warning { background: rgba(255, 193, 7, 0.2); border-color: #FFC107; }
+        .error { background: rgba(244, 67, 54, 0.2); border-color: #F44336; }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 TreasureHunt NFT Contract Deployment</h1>
+        
+        <div class="step">
+            <h3>Step 1: Connect Wallet</h3>
+            <p>Connect your MetaMask wallet to deploy the contract.</p>
+            <button onclick="connectWallet()" id="connectBtn">Connect MetaMask</button>
+            <div id="walletInfo" class="hidden">
+                <p>✅ Connected: <span id="walletAddress"></span></p>
+                <p>Network: <span id="networkName"></span></p>
+                <p>Balance: <span id="balance"></span> ETH</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Deploy Contract</h3>
+            <p>This will deploy the TreasureHuntNFT contract with you as the owner.</p>
+            <button onclick="deployContract()" id="deployBtn" disabled>Deploy Contract</button>
+            <div id="deployStatus"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Update Configuration</h3>
+            <p>Copy the deployed contract address and update your integration.js file.</p>
+            <div id="contractInfo" class="hidden">
+                <p>✅ Contract deployed successfully!</p>
+                <p><strong>Contract Address:</strong></p>
+                <input type="text" id="contractAddress" readonly onclick="this.select()">
+                <button onclick="copyAddress()">Copy Address</button>
+                <button onclick="updateIntegration()">Update integration.js</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Verification</h3>
+            <p>Test that everything is working correctly.</p>
+            <button onclick="testContract()" id="testBtn" disabled>Test Contract</button>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script>
+        let provider, signer, contractAddress;
+
+        // Contract ABI (simplified for deployment)
+        const contractABI = [
+            "constructor(address initialOwner)",
+            "function mintNFT(address recipient, string memory tokenURI) public returns (uint256)",
+            "function owner() public view returns (address)",
+            "function name() public view returns (string)",
+            "function symbol() public view returns (string)"
+        ];
+
+        // Contract bytecode (you'll need to get this from compilation)
+        const contractBytecode = "0x608060405234801561001057600080fd5b50..."; // This needs to be the actual compiled bytecode
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    alert('Please install MetaMask!');
+                    return;
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                
+                const address = await signer.getAddress();
+                const network = await provider.getNetwork();
+                const balance = await provider.getBalance(address);
+
+                document.getElementById('walletAddress').textContent = address;
+                document.getElementById('networkName').textContent = network.name;
+                document.getElementById('balance').textContent = ethers.utils.formatEther(balance);
+                
+                document.getElementById('walletInfo').classList.remove('hidden');
+                document.getElementById('deployBtn').disabled = false;
+                document.getElementById('connectBtn').textContent = '✅ Connected';
+                document.getElementById('connectBtn').disabled = true;
+
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Error connecting wallet: ' + error.message);
+            }
+        }
+
+        async function deployContract() {
+            try {
+                document.getElementById('deployStatus').innerHTML = '<p>⏳ Deploying contract... Please confirm the transaction in MetaMask.</p>';
+                
+                // Note: This is a simplified example. In reality, you'd need the compiled bytecode
+                // For now, we'll show instructions to use Remix
+                
+                document.getElementById('deployStatus').innerHTML = `
+                    <div class="warning">
+                        <h4>⚠️ Manual Deployment Required</h4>
+                        <p>For security and simplicity, please deploy using Remix IDE:</p>
+                        <ol>
+                            <li>Go to <a href="https://remix.ethereum.org/" target="_blank">Remix IDE</a></li>
+                            <li>Create a new file: TreasureHuntNFT.sol</li>
+                            <li>Copy the contract code from src/contract/TreasureHuntNFT.sol</li>
+                            <li>Compile with Solidity 0.8.20+</li>
+                            <li>Deploy with initialOwner: ${await signer.getAddress()}</li>
+                            <li>Copy the contract address and paste it below:</li>
+                        </ol>
+                        <input type="text" id="manualAddress" placeholder="Paste deployed contract address here">
+                        <button onclick="setContractAddress()">Set Contract Address</button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error deploying contract:', error);
+                document.getElementById('deployStatus').innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        function setContractAddress() {
+            const address = document.getElementById('manualAddress').value;
+            if (!ethers.utils.isAddress(address)) {
+                alert('Please enter a valid contract address');
+                return;
+            }
+            
+            contractAddress = address;
+            document.getElementById('contractAddress').value = address;
+            document.getElementById('contractInfo').classList.remove('hidden');
+            document.getElementById('testBtn').disabled = false;
+        }
+
+        function copyAddress() {
+            document.getElementById('contractAddress').select();
+            document.execCommand('copy');
+            alert('Contract address copied to clipboard!');
+        }
+
+        function updateIntegration() {
+            const code = `// Update this in src/integration.js
+const CONTRACT_ADDRESS = '${contractAddress}';
+const MOCK_MODE = false;`;
+            
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'integration-update.js';
+            a.click();
+            
+            alert('Integration update downloaded! Copy the content to your integration.js file.');
+        }
+
+        async function testContract() {
+            try {
+                document.getElementById('testResults').innerHTML = '<p>⏳ Testing contract...</p>';
+                
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                const name = await contract.name();
+                const symbol = await contract.symbol();
+                const owner = await contract.owner();
+                
+                document.getElementById('testResults').innerHTML = `
+                    <div class="success">
+                        <h4>✅ Contract Test Successful!</h4>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Symbol:</strong> ${symbol}</p>
+                        <p><strong>Owner:</strong> ${owner}</p>
+                        <p>Your contract is ready for NFT minting!</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error testing contract:', error);
+                document.getElementById('testResults').innerHTML = `<p class="error">❌ Test failed: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

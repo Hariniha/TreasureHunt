@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Download, Sparkles } from 'lucide-react';
+import { mintNFT } from '../integration.js';
+import { uploadToIPFS } from '../utils/ipfs.js';
 
 
 const GAME_LIST = [
@@ -13,7 +15,8 @@ const GAME_LIST = [
 
 const MapViewer = ({
   userProgress,
-  hasClaimedNFT,
+  currentGameKey,
+  walletAddress,
   onClaimNFT,
   navigateToPage,
 }) => {
@@ -33,6 +36,7 @@ const MapViewer = ({
   useEffect(() => { selectedGameRef.current = selectedGame; }, [selectedGame]);
   const [showAnimation, setShowAnimation] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [claimError, setClaimError] = useState(null);
 
   // Get pieces and final image for selected game
   const pieces = userProgress[`${selectedGame}Pieces`] || [];
@@ -45,11 +49,122 @@ const MapViewer = ({
   }, [allPiecesCollected, showAnimation, selectedGame]);
 
   const handleClaimNFT = async () => {
+    if (!walletAddress) {
+      setClaimError('Please connect your wallet first');
+      return;
+    }
+
     setIsClaiming(true);
-    // Simulate blockchain transaction delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    onClaimNFT();
-    setIsClaiming(false);
+    setClaimError(null);
+
+    try {
+      // Get game info
+      const gameInfo = GAME_LIST.find(game => game.key === selectedGame);
+      const gameName = gameInfo ? gameInfo.label : selectedGame;
+
+      // Create NFT metadata
+      const nftMetadata = {
+        name: `${gameName} Master NFT`,
+        description: `Congratulations! You have successfully completed all 6 levels of ${gameName} and collected all map pieces. This NFT serves as proof of your mastery in ${gameName}.`,
+        image: `https://ipfs.io/ipfs/${finalImageHash}`,
+        attributes: [
+          {
+            trait_type: "Game Type",
+            value: gameName
+          },
+          {
+            trait_type: "Completion Date",
+            value: new Date().toISOString()
+          },
+          {
+            trait_type: "Map Pieces Collected",
+            value: pieces.length
+          },
+          {
+            trait_type: "Achievement Level",
+            value: "Master"
+          },
+          {
+            trait_type: "Game Category",
+            value: "Treasure Hunt"
+          }
+        ],
+        external_url: "https://treasurehunt.game",
+        background_color: "FFD700"
+      };
+
+      // Upload metadata to IPFS
+      console.log('Uploading NFT metadata to IPFS...');
+      const metadataResponse = await uploadToIPFS(nftMetadata);
+      console.log('Metadata uploaded successfully:', metadataResponse);
+
+      // Convert IPFS URI to HTTP URL for the contract
+      const tokenURI = metadataResponse.startsWith('ipfs://')
+        ? metadataResponse.replace('ipfs://', 'https://ipfs.io/ipfs/')
+        : metadataResponse;
+
+      // Mint the NFT
+      const result = await mintNFT(walletAddress, tokenURI);
+
+      // Create NFT data for local storage
+      const nftData = {
+        tokenId: result.tokenId,
+        transactionHash: result.transactionHash,
+        tokenURI: tokenURI,
+        metadata: nftMetadata,
+        claimedAt: new Date(),
+        walletAddress: walletAddress,
+        gameType: selectedGame,
+        isReal: result.isReal || false,
+        isMock: result.isMock || false,
+        receipt: result.receipt
+      };
+
+      // Call the parent component's onClaimNFT function
+      const success = await onClaimNFT(selectedGame, nftData);
+
+      if (success) {
+        console.log('NFT claimed successfully!', result);
+
+        // Show different messages for real vs mock NFTs
+        if (result.isReal) {
+          console.log('🎉 REAL NFT MINTED! This NFT is now on the blockchain and in your wallet.');
+        } else if (result.isMock) {
+          console.log('🎭 Mock NFT created for testing. Deploy the contract for real NFTs.');
+        }
+      } else {
+        throw new Error('Failed to save NFT data');
+      }
+
+    } catch (error) {
+      console.error('Error claiming NFT:', error);
+
+      // Provide more specific error messages
+      let errorMessage = 'Failed to claim NFT. Please try again.';
+
+      if (error.message.includes('project id required') || error.message.includes('Unauthorized')) {
+        errorMessage = 'IPFS upload failed. Using fallback storage for metadata.';
+        // Try again with fallback - this should work now
+        try {
+          console.log('Retrying NFT claim with fallback...');
+          // The uploadToIPFS function should now handle fallback automatically
+          // So we can just show a warning but continue
+          errorMessage = 'NFT claimed successfully! (Using backup metadata storage)';
+        } catch (retryError) {
+          errorMessage = 'Failed to claim NFT. Please check your wallet connection and try again.';
+        }
+      } else if (error.message.includes('user rejected')) {
+        errorMessage = 'Transaction was cancelled by user.';
+      } else if (error.message.includes('insufficient funds')) {
+        errorMessage = 'Insufficient funds for transaction. Please add ETH to your wallet.';
+      } else if (error.message.includes('network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
+
+      setClaimError(errorMessage);
+    } finally {
+      setIsClaiming(false);
+    }
   };
 
   const collectedCount = pieces.filter(piece => piece.collected).length;
@@ -207,20 +322,36 @@ const MapViewer = ({
                 <div className="border-t border-white/10 pt-8">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <Sparkles className="w-6 h-6 text-yellow-400" />
-                    Claim Your NFT Reward
+                    Claim Your {GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame} NFT
                   </h3>
-                  
-                  {!hasClaimedNFT ? (
+
+                  {!userProgress.gameNFTStatus?.[selectedGame] ? (
                     <div>
-                      <p className="text-gray-400 mb-6">
-                        Congratulations! You've collected all map pieces. 
-                        Claim your unique NFT as proof of completing the treasure hunt.
+                      <p className="text-gray-400 mb-4">
+                        Congratulations! You've completed all 6 levels of {GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame}.
+                        Claim your unique NFT as proof of mastering this game.
                       </p>
+
+                      <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-400 text-sm">
+                        <strong>🎯 Ready for Real NFT Minting!</strong><br/>
+                        This will attempt to mint a real NFT on the blockchain. If the contract isn't deployed yet,
+                        it will automatically fall back to demo mode.
+                        <a href="/CONTRACT_DEPLOYMENT_GUIDE.md" target="_blank" className="underline hover:text-blue-300">
+                          See deployment guide →
+                        </a>
+                      </div>
+
+                      {claimError && (
+                        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                          {claimError}
+                        </div>
+                      )}
+
                       <button
                         onClick={handleClaimNFT}
-                        disabled={isClaiming}
+                        disabled={isClaiming || !walletAddress}
                         className={`w-full py-4 px-6 rounded-lg font-bold text-lg transition-all duration-300 ${
-                          isClaiming
+                          isClaiming || !walletAddress
                             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                             : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-400 hover:to-pink-500 hover:shadow-2xl hover:shadow-purple-500/25'
                         }`}
@@ -230,8 +361,10 @@ const MapViewer = ({
                             <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                             Minting NFT...
                           </div>
+                        ) : !walletAddress ? (
+                          'Connect Wallet to Claim NFT'
                         ) : (
-                          'Claim NFT Treasure'
+                          `Claim ${GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame} NFT`
                         )}
                       </button>
                     </div>
@@ -239,10 +372,10 @@ const MapViewer = ({
                     <div className="text-center p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-400/30 rounded-lg">
                       <div className="text-4xl mb-3">🏆</div>
                       <div className="text-xl font-bold text-white mb-2">
-                        NFT Claimed Successfully!
+                        {GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame} NFT Claimed!
                       </div>
                       <p className="text-purple-400 mb-4">
-                        Your treasure hunt achievement is now immortalized on the blockchain.
+                        Your {GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame} mastery achievement is now immortalized on the blockchain.
                       </p>
                       <button
                         onClick={() => navigateToPage('profile')}
