@@ -117,18 +117,7 @@ const WordPuzzleGame = ({
               <h1 className="text-3xl md:text-4xl font-bold text-white">
                 Level {currentPuzzle.level}
               </h1>
-              <div className="flex items-center gap-1">
-                {[...Array(4)].map((_, i) => (
-                  <Star 
-                    key={i}
-                    className={`w-6 h-6 ${
-                      i < currentLevel - 1 
-                        ? 'text-yellow-400 fill-current' 
-                        : 'text-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
+              
             </div>
             <div className="w-full bg-gray-700 rounded-full h-2">
               <div 

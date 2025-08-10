@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// Mock data: 4 memory match levels, each with a set of pairs
+
 const memoryLevels = [
   {
     level: 1,

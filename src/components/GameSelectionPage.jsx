@@ -11,7 +11,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Word Puzzles',
       description: 'Solve cryptic word challenges and riddles to unlock ancient secrets',
       icon: BookOpen,
-      difficulty: 'Medium',
+       
       levels: 6,
       available: true,
       gradient: 'from-blue-500 to-purple-600',
@@ -22,7 +22,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Memory Match',
       description: 'Test your memory by matching pairs of treasure-themed cards',
       icon: Puzzle,
-      difficulty: 'Easy',
+       
       levels: 6,
       available: true,
       gradient: 'from-yellow-400 to-orange-500',
@@ -33,7 +33,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Logic Challenges',
       description: 'Navigate through complex logical puzzles and brain teasers',
       icon: Puzzle,
-      difficulty: 'Hard',
+       
       levels: 6,
       available: true,
       gradient: 'from-green-500 to-teal-600',
@@ -44,7 +44,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Multiple Choice',
       description: 'Answer fun treasure-themed multiple choice questions',
       icon: BookOpen,
-      difficulty: 'Easy',
+       
       levels: 6,
       available: true,
       gradient: 'from-pink-400 to-yellow-400',
@@ -55,7 +55,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Riddle Quest',
       description: 'Solve classic riddles to unlock the next map piece',
       icon: Puzzle,
-      difficulty: 'Medium',
+       
       levels: 6,
       available: true,
       gradient: 'from-purple-400 to-pink-600',
@@ -66,7 +66,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
       title: 'Emoji Sequence',
       description: 'Find the next emoji in the treasure sequence',
       icon: Puzzle,
-      difficulty: 'Easy',
+       
       levels: 6,
       available: true,
       gradient: 'from-yellow-300 to-orange-400',
@@ -89,7 +89,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
           </button>
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-              Choose Your Quest
+              Choose Your Game
             </h1>
             <p className="text-xl text-gray-400">
               Select a game type to begin your treasure hunting adventure
@@ -127,10 +127,7 @@ const GameSelectionPage = ({ navigateToPage }) => {
                   <p className="text-gray-400 mb-6 leading-relaxed">{game.description}</p>
                   
                   <div className="flex items-center gap-6 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                      <span className="text-gray-300">Difficulty: {game.difficulty}</span>
-                    </div>
+                     
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                       <span className="text-gray-300">{game.levels} Levels</span>
