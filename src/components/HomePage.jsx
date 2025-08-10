@@ -4,7 +4,7 @@ import { Compass, Trophy, Sparkles, Map, Star, ChevronRight } from 'lucide-react
 const features = [
   {
     icon: Compass,
-    title: "4 Epic Levels",
+    title: "6 Epic Levels",
     description: "Each level brings unique challenges and hidden secrets",
     gradient: "from-emerald-400 to-teal-500",
   },

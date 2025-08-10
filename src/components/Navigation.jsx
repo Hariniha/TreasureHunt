@@ -26,8 +26,7 @@ const Navigation = ({
   const currentGameKey = getCurrentGameKey();
   const currentPieces = userProgress[`${currentGameKey}Pieces`] || userProgress.wordPuzzlePieces || [];
   const collectedPieces = currentPieces.filter(piece => piece.collected).length;
-  const completionPercentage = currentPieces.length > 0 ? (collectedPieces / currentPieces.length) * 100 : 0;
-
+  
   const shortenAddress = (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '';
 
   const navItems = [
@@ -130,21 +129,7 @@ const Navigation = ({
             })}
           </div>
 
-          {/* Progress Indicator */}
-          {collectedPieces > 0 && (
-            <div className="hidden lg:flex items-center gap-3">
-              <div className="text-sm text-gray-400">Progress:</div>
-              <div className="w-24 bg-gray-700 rounded-full h-2">
-                <div 
-                  className="h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-500"
-                  style={{ width: `${completionPercentage}%` }}
-                ></div>
-              </div>
-              <div className="text-sm text-white font-semibold">
-                {completionPercentage.toFixed(0)}%
-              </div>
-            </div>
-          )}
+          
 
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center gap-2">
