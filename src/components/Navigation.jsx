@@ -151,7 +151,36 @@ const Navigation = ({
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
-              
+              if (item.id === 'profile') {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      if (!walletAddress) {
+                        if (typeof onConnectWallet === 'function') {
+                          onConnectWallet();
+                        } else {
+                          alert('Please connect your wallet to view your profile.');
+                        }
+                      } else {
+                        navigateToPage('profile');
+                      }
+                    }}
+                    className={`relative p-2 rounded-lg transition-all duration-300 ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {item.badge && (
+                      <div className="absolute -top-1 -right-1 min-w-[12px] sm:min-w-[16px] h-3 sm:h-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center px-0.5 sm:px-1">
+                        {typeof item.badge === 'string' ? item.badge : item.badge}
+                      </div>
+                    )}
+                  </button>
+                );
+              }
               return (
                 <button
                   key={item.id}
