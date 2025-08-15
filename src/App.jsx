@@ -186,6 +186,7 @@ function App() {
         userProgress={userProgress}
         walletAddress={walletAddress}
         onConnectWallet={handleConnect}
+        isConnecting={isConnecting}
       />
       <main className="flex-1 pt-16 px-2 sm:px-4 md:px-8 max-w-full w-full mx-auto overflow-x-hidden">
         {currentPage === 'home' && (

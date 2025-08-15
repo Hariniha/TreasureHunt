@@ -8,7 +8,8 @@ const Navigation = ({
   navigateToPage, 
   userProgress, 
   walletAddress,
-  onConnectWallet
+  onConnectWallet,
+  isConnecting
 }) => {
 
   // Determine which pieces array to use for progress (match App.jsx logic)
@@ -77,18 +78,19 @@ const Navigation = ({
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
+              // Desktop profile button
               if (item.id === 'profile') {
                 return (
                   <button
                     key={item.id}
                     onClick={() => {
-                      if (!walletAddress) {
+                      if (!walletAddress && !isConnecting) {
                         if (typeof onConnectWallet === 'function') {
                           onConnectWallet();
                         } else {
                           alert('Please connect your wallet to view your profile.');
                         }
-                      } else {
+                      } else if (walletAddress) {
                         navigateToPage('profile');
                       }
                     }}
@@ -96,10 +98,19 @@ const Navigation = ({
                       isActive
                         ? 'bg-white/20 text-white'
                         : 'text-gray-400 hover:text-white hover:bg-white/10'
-                    }`}
+                    } ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={isConnecting}
                   >
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="font-medium text-xs sm:text-base">{item.label}</span>
+                    <span className="font-medium text-xs sm:text-base">
+                      {isConnecting ? 'Connecting...' : item.label}
+                    </span>
+                    {isConnecting && (
+                      <svg className="animate-spin h-4 w-4 ml-1 text-yellow-400" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                    )}
                     {item.badge && (
                       <div className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[20px] h-4 sm:h-5 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
                         {item.badge}
@@ -151,18 +162,19 @@ const Navigation = ({
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
+              // Mobile profile button
               if (item.id === 'profile') {
                 return (
                   <button
                     key={item.id}
                     onClick={() => {
-                      if (!walletAddress) {
+                      if (!walletAddress && !isConnecting) {
                         if (typeof onConnectWallet === 'function') {
                           onConnectWallet();
                         } else {
                           alert('Please connect your wallet to view your profile.');
                         }
-                      } else {
+                      } else if (walletAddress) {
                         navigateToPage('profile');
                       }
                     }}
@@ -170,9 +182,16 @@ const Navigation = ({
                       isActive
                         ? 'bg-white/20 text-white'
                         : 'text-gray-400 hover:text-white hover:bg-white/10'
-                    }`}
+                    } ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={isConnecting}
                   >
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {isConnecting ? (
+                      <svg className="animate-spin h-4 w-4 ml-1 text-yellow-400" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                    ) : null}
                     {item.badge && (
                       <div className="absolute -top-1 -right-1 min-w-[12px] sm:min-w-[16px] h-3 sm:h-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center px-0.5 sm:px-1">
                         {typeof item.badge === 'string' ? item.badge : item.badge}
