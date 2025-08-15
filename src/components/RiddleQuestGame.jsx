@@ -72,78 +72,58 @@ const RiddleQuestGame = ({ currentLevel = 1, onLevelComplete, navigateToPage }) 
   };
 
   return (
-    <div className="min-h-screen py-20 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-12">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 px-2 sm:px-4 py-8">
+      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-4 sm:p-8 flex flex-col gap-4 sm:gap-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-purple-700 mb-2 sm:mb-4">Riddle Quest</h2>
+        <div className="flex flex-col gap-2 sm:gap-4">
+          <div className="text-base sm:text-lg font-medium text-gray-700 text-center break-words">
+            {riddles[currentRiddleIndex]?.question}
+          </div>
+          <input
+            type="text"
+            className="mt-2 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-base sm:text-lg w-full"
+            value={userAnswer}
+            onChange={handleInputChange}
+            placeholder="Type your answer..."
+            autoFocus
+          />
           <button
-            onClick={() => navigateToPage('selection')}
-            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+            className="mt-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors w-full sm:w-auto"
+            onClick={handleSubmit}
+            disabled={isAnswerCorrect}
           >
-            ←
+            Submit
           </button>
-          <div className="flex-1">
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-3xl md:text-4xl font-bold text-white">
-                Level {puzzle.level}
-              </h1>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-500"
-                style={{ width: `${((currentLevel - 1) / 6) * 100}%` }}
-              ></div>
-            </div>
-          </div>
+          {showFeedback && (
+            <div className={`mt-2 text-center font-semibold ${isAnswerCorrect ? 'text-green-600' : 'text-red-500'}`}>{feedbackMessage}</div>
+          )}
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 mb-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Riddle Quest</h2>
-            <p className="text-gray-400 text-lg leading-relaxed">
-              {puzzle.question}
-            </p>
-          </div>
-          <div className="mb-8 flex flex-col items-center gap-4">
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter your answer..."
-              className="w-full max-w-md px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white text-center text-xl font-bold tracking-wider focus:border-yellow-400 focus:outline-none transition-colors duration-300"
-              disabled={showResult && isCorrect}
-            />
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 mt-4">
+          <div className="text-sm sm:text-base text-gray-600">Riddle {currentRiddleIndex + 1} of {riddles.length}</div>
+          <div className="flex gap-2">
             <button
-              onClick={handleSubmit}
-              disabled={!userInput.trim() || (showResult && isCorrect)}
-              className="px-8 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg text-xs sm:text-sm"
+              onClick={handlePrevRiddle}
+              disabled={currentRiddleIndex === 0}
             >
-              Submit Answer
+              Previous
+            </button>
+            <button
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg text-xs sm:text-sm"
+              onClick={handleNextRiddle}
+              disabled={currentRiddleIndex === riddles.length - 1}
+            >
+              Next
             </button>
           </div>
-          {showResult && (
-            <div className={`text-center p-6 rounded-lg border-2 ${
-              isCorrect 
-                ? 'bg-green-600/20 border-green-400 text-green-400' 
-                : 'bg-red-600/20 border-red-400 text-red-400'
-            }`}>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-xl font-bold">
-                  {isCorrect ? 'Correct!' : 'Incorrect'}
-                </span>
-              </div>
-              <p className="text-lg">
-                {isCorrect 
-                  ? 'You solved the riddle and found a map piece!' 
-                  : `The answer was "${puzzle.answer}". Try again!`
-                }
-              </p>
-            </div>
-          )}
-          {attempts > 0 && !isCorrect && (
-            <div className="text-center text-gray-400 text-sm mt-4">
-              Attempts: {attempts}
-            </div>
-          )}
+        </div>
+        <div className="w-full mt-6">
+          <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-purple-400 transition-all duration-300"
+              style={{ width: `${((currentRiddleIndex + 1) / riddles.length) * 100}%` }}
+            ></div>
+          </div>
         </div>
       </div>
     </div>

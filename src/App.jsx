@@ -179,7 +179,7 @@ function App() {
   const allPiecesCollected = currentPieces.length > 0 && currentPieces.every(piece => piece.collected);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       <Navigation 
         currentPage={currentPage}
         navigateToPage={navigateToPage}
@@ -187,7 +187,7 @@ function App() {
         walletAddress={walletAddress}
         onConnectWallet={handleConnect}
       />
-      <main className="pt-16">
+      <main className="flex-1 pt-16 px-2 sm:px-4 md:px-8 max-w-full w-full mx-auto overflow-x-hidden">
         {currentPage === 'home' && (
           <HomePage navigateToPage={navigateToPage} />
         )}
@@ -246,11 +246,9 @@ function App() {
           />
         )}
         {/* Show wallet address if connected */}
-         
         {walletAddress && currentPage === 'profile' && (
           <ProfilePage 
             userProgress={userProgress}
-            
             navigateToPage={navigateToPage}
           />
         )}

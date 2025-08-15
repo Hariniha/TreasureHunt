@@ -170,9 +170,9 @@ const MapViewer = ({
   const collectedCount = pieces.filter(piece => piece.collected).length;
 
   return (
-    <div className="min-h-screen py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-4 mb-12">
+    <div className="min-h-screen py-8 sm:py-12 md:py-20 px-2 sm:px-4 md:px-8">
+      <div className="max-w-6xl mx-auto w-full">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 sm:mb-12">
           <button
             onClick={() => navigateToPage('selection')}
             className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
@@ -180,42 +180,39 @@ const MapViewer = ({
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">
               Treasure Map
             </h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-base sm:text-lg md:text-xl text-gray-400">
               Collect all pieces to reveal the complete treasure map
             </p>
           </div>
         </div>
 
         {/* Game Selector Tabs */}
-        <div className="mb-8 flex gap-2 justify-center">
+        <div className="mb-6 sm:mb-8 flex flex-wrap gap-2 justify-center">
           {GAME_LIST.map(game => (
             <button
               key={game.key}
               onClick={() => { setSelectedGame(game.key); setShowAnimation(false); }}
-              className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 ${selectedGame === game.key ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-yellow-400/20 hover:text-yellow-400'}`}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold transition-all duration-200 text-sm sm:text-base ${selectedGame === game.key ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-gray-300 hover:bg-yellow-400/20 hover:text-yellow-400'}`}
             >
               {game.label}
             </button>
           ))}
         </div>
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
           {/* Map Display */}
           <div className="order-2 lg:order-1">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-center">
                 Ancient Treasure Map
               </h2>
-              
-              <div className="relative bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg p-8 min-h-[400px]">
+              <div className="relative bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg p-4 sm:p-8 min-h-[250px] sm:min-h-[400px]">
                 {/* Map Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg opacity-50"></div>
-                
                 {/* Map Grid */}
-
-                <div className="relative grid grid-cols-3 gap-2 h-full">
+                <div className="relative grid grid-cols-3 gap-1 sm:gap-2 h-full">
                   {pieces.map((piece) => (
                     <div
                       key={piece.id}
@@ -229,18 +226,17 @@ const MapViewer = ({
                         <img
                           src={`https://ipfs.io/ipfs/${piece.ipfsHash}`}
                           alt={`Piece ${piece.id}`}
-                          className="w-20 h-20 object-contain mx-auto"
+                          className="w-12 h-12 sm:w-20 sm:h-20 object-contain mx-auto"
                         />
                       ) : (
                         <div className="text-center text-gray-500">
-                          <div className="text-2xl mb-2">❓</div>
+                          <div className="text-lg sm:text-2xl mb-1 sm:mb-2">❓</div>
                           <div className="text-xs">Missing</div>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
-
                 {/* Complete Map Overlay */}
                 {allPiecesCollected && showAnimation && finalImageHash && (
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-200 to-amber-300 rounded-lg flex items-center justify-center animate-fade-in">
@@ -248,12 +244,12 @@ const MapViewer = ({
                       <img
                         src={`https://ipfs.io/ipfs/${finalImageHash}`}
                         alt="Final Map"
-                        className="w-48 h-48 object-contain mx-auto mb-4 rounded shadow-lg border-4 border-yellow-400"
+                        className="w-32 h-32 sm:w-48 sm:h-48 object-contain mx-auto mb-2 sm:mb-4 rounded shadow-lg border-4 border-yellow-400"
                       />
-                      <div className="text-2xl font-bold text-amber-900 mb-2">
+                      <div className="text-lg sm:text-2xl font-bold text-amber-900 mb-1 sm:mb-2">
                         Complete Treasure Map!
                       </div>
-                      <div className="text-lg text-amber-800">
+                      <div className="text-base sm:text-lg text-amber-800">
                         All pieces connected.
                       </div>
                     </div>
@@ -262,52 +258,49 @@ const MapViewer = ({
               </div>
             </div>
           </div>
-
           {/* Map Pieces Status */}
           <div className="order-1 lg:order-2">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <h2 className="text-2xl font-bold text-white">Collection Status</h2>
-                <div className="px-3 py-1 bg-yellow-400/20 text-yellow-400 rounded-full text-sm font-semibold">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-8">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-2xl font-bold text-white">Collection Status</h2>
+                <div className="px-2 sm:px-3 py-1 bg-yellow-400/20 text-yellow-400 rounded-full text-xs sm:text-sm font-semibold">
                   {collectedCount}/6 pieces
                 </div>
               </div>
-
-              <div className="space-y-4 mb-8">
+              <div className="space-y-2 sm:space-y-4 mb-6 sm:mb-8">
                 {pieces.map((piece) => (
                   <div
                     key={piece.id}
-                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                    className={`p-2 sm:p-4 rounded-lg border-2 transition-all duration-300 ${
                       piece.collected
                         ? 'bg-green-600/20 border-green-400'
                         : 'bg-gray-600/20 border-gray-600'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
                           piece.collected ? 'bg-green-400' : 'bg-gray-500'
                         }`}></div>
-                        <span className="font-semibold text-white">
+                        <span className="font-semibold text-white text-xs sm:text-base">
                           Map Piece {piece.id}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-xs sm:text-sm text-gray-400">
                         Level {piece.id}
                       </div>
                     </div>
-                    
                     {piece.collected && (
-                      <div className="mt-3 pt-3 border-t border-green-400/30">
+                      <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-green-400/30">
                         <div className="flex justify-center">
                           <img
                             src={`https://ipfs.io/ipfs/${piece.ipfsHash}`}
                             alt={`Map Piece ${piece.id}`}
-                            className="w-16 h-16 object-contain rounded border border-green-400/30"
+                            className="w-10 h-10 sm:w-16 sm:h-16 object-contain rounded border border-green-400/30"
                           />
                         </div>
                         {piece.collectedAt && (
-                          <div className="text-xs text-gray-400 mt-2 text-center">
+                          <div className="text-xs text-gray-400 mt-1 sm:mt-2 text-center">
                             Collected: {piece.collectedAt.toLocaleString()}
                           </div>
                         )}
@@ -319,7 +312,7 @@ const MapViewer = ({
 
               {/* NFT Claim Section */}
               {allPiecesCollected && (
-                <div className="border-t border-white/10 pt-8">
+                <div className="border-t border-white/10 pt-4 sm:pt-8">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <Sparkles className="w-6 h-6 text-yellow-400" />
                     Claim Your {GAME_LIST.find(g => g.key === selectedGame)?.label || selectedGame} NFT
@@ -389,7 +382,7 @@ const MapViewer = ({
               )}
 
               {!allPiecesCollected && (
-                <div className="border-t border-white/10 pt-8">
+                <div className="border-t border-white/10 pt-4 sm:pt-8">
                   <p className="text-gray-400 text-center">
                     Complete more levels to collect remaining map pieces!
                   </p>

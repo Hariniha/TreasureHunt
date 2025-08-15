@@ -26,7 +26,8 @@ const Navigation = ({
   const currentGameKey = getCurrentGameKey();
   const currentPieces = userProgress[`${currentGameKey}Pieces`] || userProgress.wordPuzzlePieces || [];
   const collectedPieces = currentPieces.filter(piece => piece.collected).length;
-  
+  const completionPercentage = currentPieces.length > 0 ? (collectedPieces / currentPieces.length) * 100 : 0;
+
   const shortenAddress = (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : '';
 
   const navItems = [
@@ -58,21 +59,21 @@ const Navigation = ({
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <div 
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer"
             onClick={() => navigateToPage('home')}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-              <Star className="w-5 h-5 text-white" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">Treasure Hunt</span>
+            <span className="text-lg sm:text-xl font-bold text-white">Treasure Hunt</span>
           </div>
 
-          {/* Navigation Items */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Navigation Items (Desktop) */}
+          <div className="hidden md:flex items-center gap-1 sm:gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -91,16 +92,16 @@ const Navigation = ({
                         navigateToPage('profile');
                       }
                     }}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                    className={`relative flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-300 ${
                       isActive
                         ? 'bg-white/20 text-white'
                         : 'text-gray-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="font-medium text-xs sm:text-base">{item.label}</span>
                     {item.badge && (
-                      <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
+                      <div className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[20px] h-4 sm:h-5 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
                         {item.badge}
                       </div>
                     )}
@@ -111,16 +112,16 @@ const Navigation = ({
                 <button
                   key={item.id}
                   onClick={() => navigateToPage(item.id)}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                  className={`relative flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-300 ${
                     isActive
                       ? 'bg-white/20 text-white'
                       : 'text-gray-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-medium text-xs sm:text-base">{item.label}</span>
                   {item.badge && (
-                    <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
+                    <div className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[20px] h-4 sm:h-5 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
                       {item.badge}
                     </div>
                   )}
@@ -129,10 +130,24 @@ const Navigation = ({
             })}
           </div>
 
-          
+          {/* Progress Indicator */}
+          {collectedPieces > 0 && (
+            <div className="hidden lg:flex items-center gap-3">
+              <div className="text-sm text-gray-400">Progress:</div>
+              <div className="w-24 bg-gray-700 rounded-full h-2">
+                <div 
+                  className="h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full transition-all duration-500"
+                  style={{ width: `${completionPercentage}%` }}
+                ></div>
+              </div>
+              <div className="text-sm text-white font-semibold">
+                {completionPercentage.toFixed(0)}%
+              </div>
+            </div>
+          )}
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-1 sm:gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -147,10 +162,9 @@ const Navigation = ({
                       : 'text-gray-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   {item.badge && (
-                    <div className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center px-1">
+                    <div className="absolute -top-1 -right-1 min-w-[12px] sm:min-w-[16px] h-3 sm:h-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center px-0.5 sm:px-1">
                       {typeof item.badge === 'string' ? item.badge : item.badge}
                     </div>
                   )}
